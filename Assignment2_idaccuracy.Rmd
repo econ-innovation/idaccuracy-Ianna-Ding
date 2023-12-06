@@ -1,0 +1,91 @@
+---
+title: "Assignment2_idaccuracy"
+author: "DYJ"
+date: "2023-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import packages
+
+
+```{r packages}
+library(readr)
+library(dplyr)
+```
+
+## Assignment2_1
+
+```{r Assignment2_1}
+# define files' path
+path <- "./assignment_idaccuracy/Aminer"
+file.exists(path)
+
+# get all files in the path
+files <- list.files(path, full.names = TRUE)
+
+# generate an empty dataframe
+all_data <- data.frame()
+
+# check that the column names are all the same
+mismatched_files <- list()
+cols <- c("doi", "标题", "期刊", "年份", "作者")
+# read csv
+for (file in files) {
+  data <- read_csv(file)
+  
+  if (all(cols %in% names(data))) {
+    all_data <- rbind(all_data, data)
+  } else {
+    mismatched_files <- c(mismatched_files, basename(file))
+  }
+}
+
+print(mismatched_files)
+# output
+write.csv(all_data, 'Aminer_df.csv', row.names = FALSE, na = "")
+```
+
+##Assignment2_2
+
+```{r Assignment2_2}
+# define files' path
+path <- "./assignment_idaccuracy/Aminer"
+file.exists(path)
+
+# get all files in the path
+files <- list.files(path, full.names = TRUE)
+
+# generate an empty dataframe
+all_data <- data.frame()
+
+# check that the column names are all the same
+mismatched_files <- list()
+cols <- c("doi", "标题", "期刊", "年份", "作者")
+
+# define function to lapply
+read_aminer <- function(file, cols_check) {
+  data <- read_csv(file)
+  if (all(cols_check %in% names(data))) {
+    return(data)
+  } else {
+    return(NULL)
+  }
+}
+
+# use lapply
+data_list <- lapply(files, function(file) read_aminer(file, cols))
+data_list <- Filter(Negate(is.null), data_list)
+
+# merge all data
+all_data <- do.call(rbind, data_list)
+
+# output
+write.csv(all_data, 'Aminer_df.csv', row.names = FALSE, na = "")
+```
+
+
+
